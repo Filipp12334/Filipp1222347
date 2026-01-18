@@ -24,7 +24,6 @@
 
         h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
 
-        /* Управление */
         .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
        
         #search-box {
@@ -34,7 +33,6 @@
             padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer;
         }
 
-        /* Кнопки языков */
         .filter-buttons { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
        
         .filter-btn {
@@ -44,7 +42,6 @@
         .filter-btn:hover { background: #d8dadf; }
         .filter-btn.active { background: #1877f2; color: white; }
 
-        /* Карточка */
         .proverb-item {
             padding: 15px; margin-bottom: 15px; background: #fff;
             border-left: 5px solid #1877f2; border-radius: 4px;
@@ -56,7 +53,6 @@
         .category-tag { font-size: 11px; text-transform: uppercase; color: #65676b; margin-bottom: 4px; }
         .proverb-text { font-size: 18px; font-weight: 600; color: #050505; }
 
-        /* Подсказка */
         .tooltip {
             display: none; margin-top: 10px; padding: 15px; background:#4e84df;
             color: white; border-radius: 8px; font-size: 14px; line-height: 1.5;
@@ -164,28 +160,23 @@ fr: "Aide-toi, le ciel t'aidera",
   
         ];
 
-        // ==========================================
-        // ЛОГИКА (ГЕНЕРАТОР)
-        // ==========================================
-       
-        // 1. Функция создания HTML из базы данных
+    
         function renderProverbs() {
             const container = document.getElementById('proverbs-list');
-            container.innerHTML = ''; // Очищаем список
+            container.innerHTML = ''; 
 
-            // Обновляем счетчик
+        
             document.getElementById('count-badge').innerText = proverbsDB.length;
 
             proverbsDB.forEach(item => {
-                // Собираем список языков, которые есть у этой поговорки
-                let langs = ['ru']; // Русский есть всегда
+                let langs = ['ru']; 
                 if(item.en) langs.push('en');
                 if(item.de) langs.push('de');
                 if(item.fr) langs.push('fr');
                 if(item.it) langs.push('it');
                 if(item.es) langs.push('es');
 
-                // Определяем название категории на русском для красоты
+            
                 let catName = "Разное";
                 if(item.cat === 'wisdom') catName = "Мудрость";
                 if(item.cat === 'animals') catName = "Животные";
@@ -194,11 +185,11 @@ fr: "Aide-toi, le ciel t'aidera",
                 if(item.cat === 'love') catName = "Любовь";
                 if(item.cat === 'time') catName = "Время";
 
-                // Создаем карточку
+                
                 const div = document.createElement('div');
                 div.className = 'proverb-item';
                 div.setAttribute('data-category', item.cat);
-                div.setAttribute('data-langs', langs.join(' ')); // получится "en de fr"
+                div.setAttribute('data-langs', langs.join(' ')); 
 
                 // Сохраняем тексты в атрибуты (для переключения)
                 div.setAttribute('data-text-ru', item.ru);
@@ -208,7 +199,7 @@ fr: "Aide-toi, le ciel t'aidera",
                 if(item.it) div.setAttribute('data-text-it', item.it);
                 if(item.es) div.setAttribute('data-text-es', item.es);
 
-                // Собираем переводы для подсказки
+               
                 let translationsHTML = '';
                 if(item.en) translationsHTML += `<p><img src="https://flagcdn.com/w40/gb.png" class="flag-icon"> ${item.en}</p>`;
                 if(item.de) translationsHTML += `<p><img src="https://flagcdn.com/w40/de.png" class="flag-icon"> ${item.de}</p>`;
@@ -216,7 +207,6 @@ fr: "Aide-toi, le ciel t'aidera",
                 if(item.it) translationsHTML += `<p><img src="https://flagcdn.com/w40/it.png" class="flag-icon"> ${item.it}</p>`;
                 if(item.es) translationsHTML += `<p><img src="https://flagcdn.com/w40/es.png" class="flag-icon"> ${item.es}</p>`;
 
-                // Вставляем HTML внутрь карточки
                 div.innerHTML = `
                     <div class="category-tag">${catName}</div>
                     <div class="proverb-text">${item.ru}</div>
@@ -230,7 +220,6 @@ fr: "Aide-toi, le ciel t'aidera",
             });
         }
 
-        // 2. Логика фильтрации (та же, что и раньше, но чуть чище)
         let currentLang = 'all';
 
         function setLang(lang, btnElement) {
@@ -247,7 +236,6 @@ fr: "Aide-toi, le ciel t'aidera",
             let items = document.getElementsByClassName('proverb-item');
 
             for (let item of items) {
-                // --- 1. СМЕНА ЯЗЫКА (Остается как было) ---
                 let textElement = item.querySelector('.proverb-text');
                 if (currentLang === 'all') {
                     textElement.innerText = item.getAttribute('data-text-ru');
@@ -256,8 +244,6 @@ fr: "Aide-toi, le ciel t'aidera",
                     textElement.innerText = trans ? trans : item.getAttribute('data-text-ru');
                 }
 
-                // --- 2. УМНЫЙ ПОИСК (НОВОЕ!) ---
-                // Мы склеиваем только тексты пословиц, игнорируя описание
                 let searchableText =
                     item.getAttribute('data-text-ru') + " " +
                     (item.getAttribute('data-text-en') || "") + " " +
@@ -266,17 +252,17 @@ fr: "Aide-toi, le ciel t'aidera",
                     (item.getAttribute('data-text-it') || "") + " " +
                     (item.getAttribute('data-text-es') || "");
 
-                // Превращаем в верхний регистр для поиска
+            
                 let matchSearch = searchableText.toUpperCase().includes(searchText);
                
-                // --- 3. ОСТАЛЬНЫЕ ФИЛЬТРЫ ---
+               
                 let itemLangs = item.getAttribute('data-langs');
                 let matchLang = (currentLang === 'all') || (itemLangs && itemLangs.includes(currentLang));
                
                 let itemCategory = item.getAttribute('data-category');
                 let matchCategory = (selectedCategory === 'all') || (itemCategory === selectedCategory);
 
-                // ИТОГ
+             
                 if (matchSearch && matchLang && matchCategory) {
                     item.style.display = "";
                 } else {
@@ -285,10 +271,9 @@ fr: "Aide-toi, le ciel t'aidera",
             }
         }
 
-        // ЗАПУСК ПРИ СТАРТЕ
-        // Как только страница загрузилась, строим список
         renderProverbs();
 
     </script>
 </body>
+
 </html>
